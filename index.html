@@ -54,16 +54,34 @@ section{position:relative;z-index:2}
 .btn:before{content:"";position:absolute;inset:0;background:var(--gold);transform:translateY(101%);transition:transform .4s;z-index:-1}
 .btn{z-index:0}.btn:hover{color:#0c0a09}.btn:hover:before{transform:none}
 .btn.done{background:var(--gold);color:#0c0a09}
-.band{overflow:hidden;white-space:nowrap;border-block:1px solid var(--line);padding:26px 0;background:var(--bg);position:relative;z-index:2}
-.band div{display:inline-block;animation:slide 30s linear infinite;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:38px;color:var(--mute)}
-.band .ur{font-size:34px;color:var(--gold);margin:0 30px;display:inline-block}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.frame canvas,.card h3{cursor:pointer}
+.ov{position:fixed;inset:0;z-index:50;background:rgba(5,4,3,.86);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s;padding:20px}
+.ov.show{opacity:1;pointer-events:auto}
+.box{position:relative;background:var(--card);border:1px solid var(--line);max-width:920px;width:100%;max-height:90vh;overflow:auto;display:grid;grid-template-columns:1fr 1fr;gap:34px;padding:34px;transform:translateY(30px) scale(.97);transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.ov.show .box{transform:none}
+.x{position:absolute;top:8px;right:14px;background:none;border:0;color:var(--ink);font-size:32px;cursor:pointer;z-index:2}
+.mimg canvas{display:block;width:100%;height:auto}
+.minfo h3{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:40px;line-height:1.1}
+.minfo p{color:var(--mute);line-height:1.8;margin:14px 0}
+dl{display:grid;grid-template-columns:auto 1fr;gap:8px 20px;font-size:14px;margin:0 0 20px}dt{color:var(--mute)}dd{margin:0}
+.price{color:var(--gold);font-size:28px;margin-bottom:16px}
+.ov.side{justify-content:flex-end;padding:0}
+.dr{display:block;max-width:430px;height:100%;max-height:none;transform:translateX(100%)}
+.ov.show .dr{transform:none}
+.item{display:flex;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.th{width:54px;height:70px;border:3px solid #c9a24f}
+.rm{background:none;border:0;color:var(--mute);font-size:24px;cursor:pointer}
+.band{overflow:hidden;white-space:nowrap;border-block:1px solid var(--line);padding:6px 0;background:var(--bg);position:relative;z-index:2;line-height:1.2}
+.band div{display:inline-block;animation:slide 30s linear infinite;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:30px;color:var(--mute);word-spacing:-.05em}
+.band .ur{font-size:28px;color:var(--gold);margin:0 14px;display:inline-block;line-height:1.9;vertical-align:middle}
 @keyframes slide{to{transform:translateX(-50%)}}
 .about{background:var(--bg);display:grid;grid-template-columns:1fr 1fr;gap:6vw;align-items:center}
 .about .big{font-size:clamp(34px,4.6vw,58px);color:var(--gold);line-height:2.1;text-align:right}
 .about p{color:var(--mute);line-height:1.9;font-size:16px}
 footer{position:relative;z-index:2;background:var(--bg);text-align:center;padding:70px 6vw 50px;border-top:1px solid var(--line);color:var(--mute);font-size:13px;letter-spacing:.2em}
 footer .ur{font-size:48px;color:var(--gold);display:block;line-height:1.6}
-@media(max-width:760px){.about{grid-template-columns:1fr}nav a:not(#cart){display:none}.card:nth-child(even){margin-top:0}}
+@media(max-width:760px){.box{grid-template-columns:1fr;padding:22px;gap:20px}.about{grid-template-columns:1fr}nav a:not(#cart){display:none}.card:nth-child(even){margin-top:0}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.card{opacity:1;transform:none}.hero h1,.hero .tag,.hero .en{opacity:1}}
 </style>
 </head>
@@ -73,12 +91,15 @@ footer .ur{font-size:48px;color:var(--gold);display:block;line-height:1.6}
   <div class="logo"><b class="ur">ظُرف</b>Zurf</div>
   <div><a href="#collection">Collection</a><a href="#story">Story</a><a href="#" id="cart">Cart · 0</a></div>
 </nav>
+<div class="ov" id="modal"><div class="box"><button class="x" id="mclose" aria-label="Close">×</button>
+  <div class="mimg frame"><div class="in2"><canvas id="mc"></canvas></div></div>
+  <div class="minfo"><h3 id="mt"></h3><div class="sub" id="ma"></div><p id="md"></p><dl id="mdl"></dl><div class="price" id="mp"></div><button class="btn" id="mb">Add to cart</button></div></div></div>
+<div class="ov side" id="drawer"><div class="box dr"><button class="x" id="dclose" aria-label="Close">×</button><h3 style="font-family:'Cormorant Garamond',serif;font-size:34px;margin-bottom:14px">Your cart</h3><div id="items"></div><div class="price" id="tot" style="margin:20px 0 14px"></div><button class="btn" id="chk">Checkout</button></div></div>
 
 <section class="hero">
   <h1>ظُرف</h1>
   <div class="tag ur">جہاں رنگ سانس لیتے ہیں</div>
   <div class="en">Zurf — original paintings, hung with intention</div>
-  <div class="cue">Scroll</div>
 </section>
 
 <div class="band"><div id="marq"></div></div>
@@ -101,12 +122,12 @@ footer .ur{font-size:48px;color:var(--gold);display:block;line-height:1.6}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const works=[
- {t:"Midnight Bloom",a:"A. Rahman",p:420,c:["#1b1e4b","#e05a7a","#f4c26b","#2a9d8f"]},
- {t:"Desert Hymn",a:"S. Qureshi",p:380,c:["#d9822b","#7a2e1b","#f6dfa3","#3b2a20"]},
- {t:"Indus at Dusk",a:"M. Farooq",p:560,c:["#0f3d56","#3fa7a3","#f2c879","#e8745b"]},
- {t:"Silent Garden",a:"N. Iqbal",p:340,c:["#1f4d36","#a6c48a","#f1e8c9","#c4566a"]},
- {t:"Gold Leaf Nocturne",a:"H. Zaidi",p:720,c:["#0b0b12","#d4a85a","#5b3a8c","#f6e9bd"]},
- {t:"Monsoon Letters",a:"R. Siddiqui",p:450,c:["#27374d","#9db2bf","#dde6ed","#e0875a"]}
+ {t:"Midnight Bloom",a:"A. Rahman",p:420,m:"Oil on canvas",z:"60 × 78 cm",y:2025,d:"Deep indigo night broken by blooms of rose and amber, painted in layered glazes so the colour seems to glow from within.",c:["#1b1e4b","#e05a7a","#f4c26b","#2a9d8f"]},
+ {t:"Desert Hymn",a:"S. Qureshi",p:380,m:"Acrylic on canvas",z:"60 × 78 cm",y:2025,d:"Burnt oranges and sand-gold sweep across the surface like wind over dunes, a study of warmth and stillness.",c:["#d9822b","#7a2e1b","#f6dfa3","#3b2a20"]},
+ {t:"Indus at Dusk",a:"M. Farooq",p:560,m:"Oil on linen",z:"70 × 91 cm",y:2026,d:"The river at the last hour of light, teal water meeting a coral sky. Thick palette-knife texture in the foreground.",c:["#0f3d56","#3fa7a3","#f2c879","#e8745b"]},
+ {t:"Silent Garden",a:"N. Iqbal",p:340,m:"Watercolour and ink on paper",z:"50 × 65 cm",y:2024,d:"A quiet courtyard in soft greens with a single note of crimson, built from translucent washes and fine ink lines.",c:["#1f4d36","#a6c48a","#f1e8c9","#c4566a"]},
+ {t:"Gold Leaf Nocturne",a:"H. Zaidi",p:720,m:"Mixed media with gold leaf",z:"80 × 104 cm",y:2026,d:"Violet shadows lit by hand-laid gold leaf that shifts as you move past it. The centrepiece of the collection.",c:["#0b0b12","#d4a85a","#5b3a8c","#f6e9bd"]},
+ {t:"Monsoon Letters",a:"R. Siddiqui",p:450,m:"Acrylic and charcoal on canvas",z:"60 × 78 cm",y:2025,d:"Grey-blue rain clouds pierced by a burnt-orange glow, with charcoal strokes like handwriting caught in a storm.",c:["#27374d","#9db2bf","#dde6ed","#e0875a"]}
 ];
 function rng(s){return()=>(s=(s*16807)%2147483647)/2147483647}
 function paint(cv,seed,pal){
@@ -120,18 +141,40 @@ function paint(cv,seed,pal){
   x.globalAlpha=1;
   const n=x.getImageData(0,0,w,h),d=n.data;for(let i=0;i<d.length;i+=4){const k=(r()-.5)*14;d[i]+=k;d[i+1]+=k;d[i+2]+=k}x.putImageData(n,0,0);
 }
-// Gallery cards
-let cart=0;const grid=document.getElementById('grid'),cartEl=document.getElementById('cart');
+// Gallery cards, modal, cart
+const inCart=new Set(),grid=document.getElementById('grid'),cartEl=document.getElementById('cart'),btns=[];
+const $=id=>document.getElementById(id),modal=$('modal'),drawer=$('drawer');let cur=0;
+function sync(){cartEl.textContent='Cart · '+inCart.size;
+  btns.forEach((b,i)=>{const on=inCart.has(i);b.classList.toggle('done',on);b.textContent=on?'In cart ✓':'Add to cart'});
+  const mb=$('mb'),on=inCart.has(cur);mb.classList.toggle('done',on);mb.textContent=on?'In cart ✓ (remove)':'Add to cart';
+  const it=$('items');it.innerHTML='';let tot=0;
+  inCart.forEach(i=>{const w=works[i];tot+=w.p;const r=document.createElement('div');r.className='item';
+    r.innerHTML=`<div class="th" style="background:linear-gradient(135deg,${w.c[0]},${w.c[1]},${w.c[3]})"></div><div style="flex:1"><div>${w.t}</div><div class="sub" style="margin:2px 0 0">${w.a}</div></div><div style="color:var(--gold)">$${w.p}</div><button class="rm" aria-label="Remove">×</button>`;
+    r.querySelector('.rm').onclick=()=>{inCart.delete(i);sync()};it.appendChild(r)});
+  if(!inCart.size)it.innerHTML='<p style="color:var(--mute);padding:20px 0">Your cart is empty.</p>';
+  $('tot').textContent=inCart.size?'Total  $'+tot:'';$('chk').style.display=inCart.size?'':'none'}
+function toggle(i){inCart.has(i)?inCart.delete(i):inCart.add(i);sync()}
+function lock(){document.body.style.overflow=(modal.classList.contains('show')||drawer.classList.contains('show'))?'hidden':''}
+function openM(i){cur=i;const w=works[i];paint($('mc'),i+1,w.c);$('mt').textContent=w.t;$('ma').textContent='BY '+w.a.toUpperCase()+' · ORIGINAL · 1 OF 1';$('md').textContent=w.d;
+  $('mdl').innerHTML=`<dt>Medium</dt><dd>${w.m}</dd><dt>Size</dt><dd>${w.z} (framed)</dd><dt>Year</dt><dd>${w.y}</dd><dt>Includes</dt><dd>Signed, framed, certificate of authenticity</dd>`;
+  $('mp').textContent='$'+w.p;modal.classList.add('show');sync();lock()}
+function closeAll(){modal.classList.remove('show');drawer.classList.remove('show');lock()}
+$('mb').onclick=()=>toggle(cur);$('mclose').onclick=closeAll;$('dclose').onclick=closeAll;
+[modal,drawer].forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeAll()}));
+addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
+cartEl.onclick=e=>{e.preventDefault();drawer.classList.add('show');lock()};
+$('chk').onclick=()=>{$('chk').textContent='Checkout opens soon — thank you!'};
 works.forEach((w,i)=>{
   const d=document.createElement('div');d.className='card';
-  d.innerHTML=`<div class="frame"><div class="in2"><canvas></canvas></div></div><div class="meta"><h3>${w.t}</h3><span>$${w.p}</span></div><div class="sub">${w.a.toUpperCase()} · ORIGINAL · 1 OF 1</div><button class="btn">Acquire</button>`;
+  d.innerHTML=`<div class="frame"><div class="in2"><canvas></canvas></div></div><div class="meta"><h3>${w.t}</h3><span>$${w.p}</span></div><div class="sub">${w.a.toUpperCase()} · ${w.m.toUpperCase()}</div><div class="row"><button class="btn add">Add to cart</button><button class="btn det">Details</button></div>`;
   grid.appendChild(d);paint(d.querySelector('canvas'),i+1,w.c);
   const f=d.querySelector('.in2');
   d.querySelector('.frame').addEventListener('mousemove',e=>{const b=e.currentTarget.getBoundingClientRect(),px=(e.clientX-b.left)/b.width-.5,py=(e.clientY-b.top)/b.height-.5;f.style.transform=`rotateY(${px*14}deg) rotateX(${-py*14}deg) scale(1.03)`});
   d.querySelector('.frame').addEventListener('mouseleave',()=>f.style.transform='');
-  const btn=d.querySelector('.btn');
-  btn.onclick=()=>{const on=btn.classList.toggle('done');btn.textContent=on?'In your cart':'Acquire';cart+=on?1:-1;cartEl.textContent='Cart · '+cart};
+  [d.querySelector('.frame'),d.querySelector('h3'),d.querySelector('.det')].forEach(el=>el.onclick=()=>openM(i));
+  const btn=d.querySelector('.add');btns.push(btn);btn.onclick=()=>toggle(i);
 });
+sync();
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
 document.querySelectorAll('.card').forEach((c,i)=>{c.style.transitionDelay=(i%3)*.12+'s';io.observe(c)});
 // Marquee
